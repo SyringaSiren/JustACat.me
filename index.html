@@ -1,1 +1,474 @@
-Welcome to JustACat.me.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Showcasing my GitHub projects and achievements" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JustACat.me</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f6f7f9;
+            color: #000;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            background-color: grey;
+            color: white;
+            padding: 1.5em;
+            text-align: center;
+        }
+
+        main {
+            max-width: 960px;
+            margin: 1em auto;
+            padding: 1em;
+            background-color: white;
+            border-radius: 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 2em;
+        }
+
+        h2 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+        }
+
+        /* Dark mode classes */
+        body.dark-mode {
+            background-color: #202020;
+            color: #f1f1f1;
+        }
+
+        body.dark-mode header {
+            background-color: #444444;
+        }
+
+        body.dark-mode main {
+            background-color: #2a2a2a;
+        }
+
+        body.dark-mode .project-list .project-item {
+            background-color: #3a3a3a;
+            border-color: #555;
+        }
+
+        footer {
+            text-align: center;
+            padding: 1em;
+            background-color: #e8e8e8;
+            margin-top: 1em;
+            border-radius: 0 0 8px 8px;
+            transition: background-color 0.3s ease;
+        }
+
+        body.dark-mode footer {
+            background-color: #333;
+        }
+
+        /* Simple tabs styling */
+        .tabs {
+            list-style-type: none;
+            display: flex;
+            gap: 1em;
+            padding: 0;
+            margin: 1em 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .tabs li {
+            cursor: pointer;
+            padding: 0.5em 1em;
+            background-color: #ccc;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .tabs li.active {
+            background-color: #fff;
+            border: 1px solid #ccc;
+            border-bottom: none;
+            position: relative;
+            top: 1px;
+        }
+
+        .tab-content {
+            display: none;
+            margin: 1em 0;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 0 6px 6px 6px;
+        }
+
+        .tab-content.active {
+            display: block;
+            background-color: #fff;
+        }
+
+        body.dark-mode .tabs li {
+            background-color: #555;
+            color: #f1f1f1;
+        }
+
+        body.dark-mode .tabs li.active {
+            background-color: #2a2a2a;
+            border-color: #666;
+        }
+
+        body.dark-mode .tab-content {
+            background-color: #3a3a3a;
+            border-color: #555;
+            color: #f1f1f1;
+        }
+
+        .project-item {
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background-color: #fff;
+        }
+
+        pre {
+            background-color: #f4f4f4;
+            padding: 1em;
+            overflow-x: auto;
+            border-radius: 4px;
+        }
+
+        code {
+            font-family: Consolas, Monaco, Courier New, monospace;
+        }
+
+        /* Styling for dark-mode code block */
+        body.dark-mode pre {
+            background-color: #2a2a2a;
+            border: 1px solid #444;
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>JustACat.me</h1>
+    <button id="theme-toggle">Toggle Dark Mode</button>
+</header>
+
+<main>
+
+    <!-- Project Tabs -->
+    <h2>My GitHub Projects</h2>
+    <ul class="tabs">
+        <li class="tab-link active" data-tab="tab-1">NEA-2024</li>
+        <li class="tab-link" data-tab="tab-2">RealFemboy.Tech</li>
+    </ul>
+
+    <!-- NEA-2024 Tab Content -->
+    <div id="tab-1" class="tab-content active">
+        <h3>NEA-2024</h3>
+        <p>A 3D game made with MonoGame, using OOP and other such skills.</p>
+        <p>
+            <a href="https://github.com/hotpiggycharlie" target="_blank">View on GitHub</a>
+        </p>
+        <p>I loved this project, but my lord was it a mess. Here's a highlight</p>
+        <pre><code class="language-csharp">
+
+/// Updates the positions of equipped upgrades.
+
+private void UpdateEquippedUpgradesPosition(Vector3 offsetPosition)
+{
+    foreach (UpgradeDisplay upgrade in UpgradeDisplays)
+    {
+        if (EquippedMovementUpgrades.Contains(upgrade.Upgrade))
+        {
+            Vector3 offset = new(0.25f, 0.125f, 0.25f);
+            upgrade.Location = Slots[upgrade.BoundSlotX, upgrade.BoundSlotY].Location + offset + offsetPosition;
+        }
+    }
+}
+
+
+/// Checks if an upgrade is being selected by the user.
+
+private void CheckUpgradeSelection(MouseState mouseState, Ray mouseRay, float? backColliding)
+{
+    if (backColliding != null)
+    {
+        foreach (UpgradeDisplay upgrade in UpgradeDisplays)
+        {
+            bool hovering = false;
+            for (int x = 0; x < upgrade.Colliders.GetLength(0); x++)
+            {
+                for (int y = 0; y < upgrade.Colliders.GetLength(1); y++)
+                {
+                    if (upgrade.Colliders[x, y] != null)
+                    {
+                        float? colliding = mouseRay.Intersects((BoundingBox)upgrade.Colliders[x, y]);
+                        if (colliding != null)
+                        {
+                            hovering = true;
+                            if (mouseState.LeftButton == ButtonState.Pressed)
+                            {
+                                StartUpgradeSelection(upgrade, x, y, mouseRay, backColliding.Value);
+                            }
+                        }
+                    }
+                }
+            }
+            upgrade.Hovering = hovering;
+        }
+    }
+}
+
+
+/// Starts the selection of an upgrade.
+
+private void StartUpgradeSelection(UpgradeDisplay upgrade, int x, int y, Ray mouseRay, float backColliding)
+{
+    upgrade.Collider = (BoundingBox)upgrade.Colliders[x, y];
+    ColliderOrderX = x;
+    ColliderOrderY = y;
+    GrabbingOffset = upgrade.Location - (mouseRay.Direction * backColliding);
+    upgrade.Selected = true;
+
+    if (upgrade.Equipped && CanFit(mouseRay, upgrade, 1) != null)
+    {
+        upgrade.Equipped = false;
+        OwnedMovementUpgrades.Add(upgrade.Upgrade);
+        EquippedMovementUpgrades.Remove(upgrade.Upgrade);
+    }
+    else if (upgrade.Equipped)
+    {
+        upgrade.Selected = false;
+    }
+}
+
+
+/// Moves the selected upgrade according to the user's mouse movements.
+
+private void MoveSelectedUpgrade(MouseState mouseState, Ray mouseRay, float? backColliding)
+{
+    foreach (UpgradeDisplay upgrade in UpgradeDisplays)
+    {
+        if (upgrade.Selected && backColliding != null)
+        {
+            MoveUpgrade(upgrade, mouseRay, backColliding.Value);
+            if (mouseState.LeftButton == ButtonState.Released)
+            {
+                PlaceBlock(mouseRay, upgrade);
+            }
+            else
+            {
+                HighlightSlots(mouseRay, upgrade);
+            }
+        }
+    }
+}
+
+
+/// Moves the upgrade to the new position.
+
+private void MoveUpgrade(UpgradeDisplay upgrade, Ray mouseRay, float backColliding)
+{
+    upgrade.MoveTo((mouseRay.Direction * backColliding) + GrabbingOffset);
+    Vector3 temp = upgrade.Location;
+    temp.Y = -0.2f;
+    upgrade.Location = temp;
+}
+
+
+/// Highlights the slots where the upgrade can be placed.
+
+private void HighlightSlots(Ray mouseRay, UpgradeDisplay upgrade)
+{
+    if (CanFit(mouseRay, upgrade, 2) == null)
+    {
+        foreach (UpgradeSlot slot in Slots)
+        {
+            slot.SetColour(new Vector3(1, 0, 0));
+        }
+    }
+    else
+    {
+        foreach (UpgradeSlot slot in Slots)
+        {
+            slot.SetColour(new Vector3(0, 1, 0));
+        }
+    }
+}
+
+
+/// Places the upgrade in the slot if possible.
+
+private void PlaceBlock(Ray mouseRay, UpgradeDisplay upgrade)
+{
+    upgrade.Selected = false;
+    UpgradeSlot slot = CanFit(mouseRay, upgrade, 0);
+    Vector3 offset = new(0.25f, -0.05f, 0.25f);
+
+    if (slot != null)
+    {
+        upgrade.MoveTo(slot.Location + offset);
+        int[] order = GetSlotOrder(slot);
+        upgrade.BoundSlotX = order[0];
+        upgrade.BoundSlotY = order[1];
+        upgrade.Equipped = true;
+        OwnedMovementUpgrades.Remove(upgrade.Upgrade);
+        EquippedMovementUpgrades.Add(upgrade.Upgrade);
+    }
+    else
+    {
+        // Return to original place if no available slot
+        upgrade.Location = upgrade.StartLocation;
+    }
+}
+
+
+/// Checks if the upgrade can fit in the current slot.
+
+private UpgradeSlot CanFit(Ray mouseRay, UpgradeDisplay upgrade, int placing)
+{
+    for (int j = 0; j < Slots.GetLength(0); j++)
+    {
+        for (int m = 0; m < Slots.GetLength(1); m++)
+        {
+            float? tryRay = mouseRay.Intersects(Slots[j, m].Collider);
+            if (tryRay != null)
+            {
+                if (TryPlaceUpgrade(upgrade, j, m, placing))
+                {
+                    return Slots[j - ColliderOrderY, m - ColliderOrderX];
+                }
+            }
+        }
+    }
+    return null;
+}
+
+
+/// Tries to place the upgrade in the slot.
+
+private bool TryPlaceUpgrade(UpgradeDisplay upgrade, int j, int m, int placing)
+{
+    CustomLinkedList mustBeClear = new();
+    int slotTopRightY = j - ColliderOrderY;
+    int slotTopRightX = m - ColliderOrderX;
+    bool canBePlaced = true;
+
+    if (IsWithinBounds(j, m, ColliderOrderY, ColliderOrderX))
+    {
+        for (int shapeX = 0; shapeX < upgrade.Upgrade.Shape.GetLength(0); shapeX++)
+        {
+            for (int shapeY = 0; shapeY < upgrade.Upgrade.Shape.GetLength(1); shapeY++)
+            {
+                if (upgrade.Upgrade.Shape[shapeX, shapeY])
+                {
+                    if (IsWithinSlotBounds(slotTopRightX, slotTopRightY, shapeX, shapeY))
+                    {
+                        if (!Slots[slotTopRightY + shapeY, slotTopRightX + shapeX].Empty)
+                        {
+                            canBePlaced = HandleOccupiedSlot(placing, mustBeClear, slotTopRightY + shapeY, slotTopRightX + shapeX);
+                        }
+                        else
+                        {
+                            if (placing == 0)
+                            {
+                                mustBeClear.Add(Slots[slotTopRightY + shapeY, slotTopRightX + shapeX]);
+                            }
+                        }
+                        Slots[slotTopRightY + shapeY, slotTopRightX + shapeX].Hovering = true;
+                    }
+                    else
+                    {
+                        canBePlaced = false;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        canBePlaced = false;
+    }
+
+    UpdateSlotStates(placing, canBePlaced, mustBeClear);
+
+    return canBePlaced;
+}
+    </code></pre>
+    </div>
+
+    <!-- RealFemboy.Tech Tab Content -->
+    <div id="tab-2" class="tab-content">
+        <h3>RealFemboy.Tech</h3>
+        <p>A website that I may or may not own. A work in progress, and not one you want to be around for.</p>
+        <p>
+            <a href="https://github.com/hotpiggycharlie/RealFemboy.Tech" target="_blank">View on GitHub</a>
+        </p>
+        <p>First ever website I've made, hosted by digitalocean with a domain name I couldn't be more proud of.</p>
+        <p>This is exactly what you signed up for.</p>
+        <p>all provided for free by the github education program.</p>
+        <pre><code class="language-html">
+<!-- Example HTML snippet from RealFemboy.Tech -->
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RealFemboy.Tech</title>
+</head>
+<body>
+  <main>
+    <p>Under construction...</p>
+  </main>
+</body>
+</html>
+    </code></pre>
+    </div>
+
+    <!-- Achievements Section -->
+    <section>
+        <h2>Achievements</h2>
+        <ul>
+            <li>Achievement #1: Finished my NEA: 27/3/2025.</li>
+            <li>Achievement #2: Built this website? 28/3/2025.</li>
+            <!-- Add more achievements as needed -->
+        </ul>
+    </section>
+</main>
+
+<footer>
+    &copy; 2025 JustACat.me
+</footer>
+
+<script>
+    // Dark mode toggle
+    const themeToggleBtn = document.getElementById("theme-toggle");
+    themeToggleBtn.addEventListener("click", () => {
+        document.body.classList.toggle("dark-mode");
+    });
+
+    // Tab functionality
+    const tabLinks = document.querySelectorAll(".tab-link");
+    const tabContents = document.querySelectorAll(".tab-content");
+
+    tabLinks.forEach((link) => {
+        link.addEventListener("click", () => {
+            // Remove active class from all tabs
+            tabLinks.forEach((l) => l.classList.remove("active"));
+            // Remove active class from all tab content
+            tabContents.forEach((content) => content.classList.remove("active"));
+
+            // Add active class to clicked tab and associated content
+            link.classList.add("active");
+            const tabId = link.getAttribute("data-tab");
+            document.getElementById(tabId).classList.add("active");
+        });
+    });
+</script>
+
+</body>
+</html>
