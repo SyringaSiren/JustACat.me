@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Ruth</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        main {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            color: #ffffff;
+        }
+        h2{
+            color: #4CAF50;
+        }
+        p {
+            line-height: 1.6;
+        }
+        ul {
+            list-style-type: disc;
+            margin-left: 20px;
+        }
+        .content-section {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .content-section.visible {
+            max-height: 1000px; /* Adjust this value as needed */
+        }
+        .toggle-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .interactive {
+            display: none;
+            margin-top: 20px;
+        }
+        .interactive.visible {
+            display: block;
+        }
+        .interactive a {
+             display: inline-block;
+             margin: 20px 0; /* Adjust the value as needed */
+         }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>For Ruth: (page 27 in notes)</h1>
+    </header>
+    <main>
+
+        <button class="toggle-button" onclick="toggleVisibility('half-adders')">Toggle Half Adders</button>
+        <div id="half-adders" class="content-section">
+            <h2>Half Adders</h2>
+            <p>A half adder is a type of adder, an electronic circuit that performs the addition of two binary digits. The half adder produces a sum and a carry value, which are both binary digits. The half adder has two inputs, usually labeled A and B, and two outputs, the sum (S) and the carry (C).</p>
+            <p>A single half-adder adds 1 bit to another</p>
+            <table>
+                <tr>
+                    <th>Input A</th>
+                    <th>Input B</th>
+                    <th>Sum (S)</th>
+                    <th>Carry (C)</th>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                    <td>0</td>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>1</td>
+                    <td>0</td>
+                    <td>1</td>
+                </tr>
+            </table>
+            <p>The logic equations for the half adder are:</p>
+            <ul>
+                <li>Sum (S) = A XOR B</li>
+                <li>Carry (C) = A AND B</li>
+            </ul>
+            <p>This doesn't do regular binary addition! It can't use the carry bit it produces as it only adds 2 bits!</p>
+            <p>looks like this:</p>
+            <img src="Half_Adder.jpg" alt="Half adder">
+            <div></div>
+            <button class="toggle-button" onclick="toggleInteractive('interactive-half-adders')", style="background-color: red">Show Interactive Half Adder</button>
+            <div id="interactive-half-adders" class="interactive">
+                <label for="half-adder-a">A:</label>
+                <input type="checkbox" id="half-adder-a">
+                <label for="half-adder-b">B:</label>
+                <input type="checkbox" id="half-adder-b">
+                <p>Sum: <span id="half-adder-sum">0</span></p>
+                <p>Carry: <span id="half-adder-carry">0</span></p>
+            </div>
+        </div>
+
+
+        <button class="toggle-button" onclick="toggleVisibility('adders')">Toggle Adders</button>
+        <div id="adders" class="content-section">
+            <h2>Adders</h2>
+            <p>An adder is a digital circuit that performs addition of numbers. In many computers and other kinds of processors, adders are used in the arithmetic logic units or ALUs. They are also used in other parts of the processor, where they are used to calculate addresses, table indices, and similar operations.</p>
+            <p>The image in the top right of notes is of a full-adder, you can draw the missing parts of the one in your full-adder notes if you like</p>
+            <p>These do regular binary addition as they use 2 half-adders to consider the carry bit into the addition</p>
+            <p>Concatenating 4 of these adders together, linking the carry bit out of one adder into the input carry bit of another adder, as they each take 3 bits input and output 2, would allow the addition of 4 bits in binary</p>
+            <p>Truth table looks like:</p>
+            <table>
+                <tr>
+                    <th>Input A</th>
+                    <th>Input B</th>
+                    <th>Carry In</th>
+                    <th>Sum (S)</th>
+                    <th>Carry Out (C)</th>
+                </tr>
+                <tr>
+                    <th>0</th>
+                    <th>0</th>
+                    <th>0</th>
+                    <th>0</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>0</th>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>1</th>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>0</th>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>1</th>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <th>1</th>
+                    <th>0</th>
+                    <th>0</th>
+                    <th>1</th>
+                </tr>
+                <tr>
+                    <th>1</th>
+                    <th>1</th>
+                    <th>1</th>
+                    <th>1</th>
+                    <th>1</th>
+                </tr>
+            </table>
+            <p>The logic equations for the full adder are:</p>
+            <ul>
+                <li>Sum (S) = A XOR B XOR Carry In</li>
+                <li>Carry Out (C) = (A AND B) OR (Carry In AND (A XOR B))</li>
+            </ul>
+            <p>looks like this:</p>
+            <img src="Full_Adder.png" alt="Full Adder">
+            <div></div>
+            <button class="toggle-button" onclick="toggleInteractive('interactive-adders')" style="background-color: red">Show Interactive Adder</button>
+            <div id="interactive-adders" class="interactive">
+                that's too hard to implement right now, its just 2 half-adders (surprising I know), one handles basic adding, one handles the carry bit.
+            </div>
+        </div>
+
+        <button class="toggle-button" onclick="toggleVisibility('d-flip-flops')">Toggle D-type Edge Rising Flip-Flops</button>
+        <div id="d-flip-flops" class="content-section">
+            <h2>D-type Edge Rising Flip-Flops</h2>
+            <p>Output Q and NOT Q, inputs D and Clock Signal</p>
+            <p>A D-type flip-flop, also known as a data or delay flip-flop, is a type of flip-flop that captures the value of the D-input at a definite portion of the clock cycle (such as the rising edge of the clock). The captured value becomes the Q output. D-type flip-flops are widely used in digital electronics for storing state information.</p>
+            <p>The characteristic equation for a D-type flip-flop is:</p>
+            <ul>
+                <li>Q(next) = D</li>
+            </ul>
+            <p>Basically, whatever state D is when the Clock is rising (look at pg 29 and 30 for graphs of D and Clock), is the state of Q until the next clock rise</p>
+            <button class="toggle-button" onclick="toggleInteractive('interactive-d-flip-flops')" style="background-color: red">Show Interactive D-type Flip-Flop</button>
+            <div id="interactive-d-flip-flops" class="interactive">
+                <label for="d-flip-flop-d">D:</label>
+                <input type="checkbox" id="d-flip-flop-d">
+                <label for="d-flip-flop-clk">Clock:</label>
+                <input type="checkbox" id="d-flip-flop-clk">
+                <p>Q: <span id="d-flip-flop-q">0</span></p>
+            </div>
+            <button class="toggle-button" onclick="toggleInteractive('Answers')" style="background-color: red;">Show graph answers</button>
+            <div id="Answers" class="interactive" style="max-height: 10000px;">
+                <a href="part%20(1).jpg" target="_blank">
+                    graph 1  maybe
+                </a>
+                <div></div>
+                <a href="part%20(2).jpg" target="_blank">
+                    graph 2 possibly
+                </a>
+                <div></div>
+                <a href="part%20(3).jpg" target="_blank">
+                    end table if you squint
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
