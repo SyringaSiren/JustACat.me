@@ -5,77 +5,83 @@
     <meta name="description" content="Showcasing my GitHub projects and achievements" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>JustACat.me</title>
-    <link rel="stylesheet" href="styles.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
-<body>
+<body class="bg-light text-dark">
 
-<header>
+<header class="bg-secondary text-white text-center py-4">
     <h1>JustACat.me</h1>
-    <button id="theme-toggle">Toggle Dark Mode</button>
 </header>
 
-<main>
+<main class="container my-4">
 
     <!-- Project Tabs -->
-    <h2>My GitHub Projects</h2>
-    <ul class="tabs">
-        <li class="tab-link active" data-tab="tab-1">NEA-2024</li>
-        <li class="tab-link" data-tab="tab-2">RealFemboy.Tech</li>
+    <h2 class="mb-4">My GitHub Projects</h2>
+    <ul class="nav nav-tabs" id="projectTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="nea-tab" data-bs-toggle="tab" data-bs-target="#nea" type="button" role="tab" aria-controls="nea" aria-selected="true">NEA-2024</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="realfemboy-tab" data-bs-toggle="tab" data-bs-target="#realfemboy" type="button" role="tab" aria-controls="realfemboy" aria-selected="false">RealFemboy.Tech</button>
+        </li>
+        <li class="nav-item" role="presentation">
+        <button class="nav-link" id="justacat-tab" data-bs-toggle="tab" data-bs-target="#justacat" type="button" role="tab" aria-controls="justacat" aria-selected="false">JustACat.me</button>
+    </li>
     </ul>
+    <div class="tab-content mt-3">
+        <!-- NEA-2024 Tab Content -->
+        <div class="tab-pane fade show active" id="nea" role="tabpanel" aria-labelledby="nea-tab">
+            <h3>NEA-2024</h3>
+            <p>A 3D game made with MonoGame, using OOP and other such skills.</p>
+            <p>
+                <a href="https://github.com/hotpiggycharlie" target="_blank" class="btn btn-primary">View on GitHub</a>
+            </p>
+            <p>I loved this project, but my lord was it a mess. Here's a highlight</p>
+            <button id="toggle-code" class="btn btn-secondary">Show/Hide Code</button>
+            <pre id="code-block" class="d-none bg-dark text-white p-3 rounded"><code class="language-csharp"></code></pre>
+        </div>
 
-    <!-- NEA-2024 Tab Content -->
-    <div id="tab-1" class="tab-content active">
-        <h3>NEA-2024</h3>
-        <p>A 3D game made with MonoGame, using OOP and other such skills.</p>
-        <p>
-            <a href="https://github.com/hotpiggycharlie" target="_blank">View on GitHub</a>
-        </p>
-        <p>I loved this project, but my lord was it a mess. Here's a highlight</p>
-        <button id="toggle-code">Show/Hide Code</button>
-        <pre id="code-block"><code class="language-csharp"></code></pre>
-    </div>
-
-    <!-- RealFemboy.Tech Tab Content -->
-    <div id="tab-2" class="tab-content">
-        <h3>RealFemboy.Tech</h3>
-        <p>A website that I may or may not own. A work in progress, and not one you want to be around for.</p>
-        <p>
-            <a href="https://github.com/hotpiggycharlie/RealFemboy.Tech" target="_blank">View on GitHub</a>
-        </p>
-        <p>First ever website I've made, hosted by digitalocean with a domain name I couldn't be more proud of.</p>
-        <p>This is exactly what you signed up for.</p>
-        <p>all provided for free by the github education program.</p>
-        <pre><code class="language-html">
-<!-- Example HTML snippet from RealFemboy.Tech -->
-<!DOCTYPE html>
-<html>
-<head>
-  <title>RealFemboy.Tech</title>
-</head>
-<body>
-  <main>
-    <p>Under construction...</p>
-  </main>
-</body>
-</html>
-    </code></pre>
+        <!-- RealFemboy.Tech Tab Content -->
+        <div class="tab-pane fade" id="realfemboy" role="tabpanel" aria-labelledby="realfemboy-tab">
+            <h3>RealFemboy.Tech</h3>
+            <p>A website that I may or may not own. A work in progress, and not one you want to be around for.</p>
+            <p>
+                <a href="https://github.com/hotpiggycharlie/RealFemboy.Tech" target="_blank" class="btn btn-primary">View on GitHub</a>
+            </p>
+            <p>First ever website I've made, hosted by digitalocean with a domain name I couldn't be more proud of.</p>
+            <p>This is exactly what you signed up for.</p>
+            <p>all provided for free by the github education program.</p>
+            <embed src="https://realfemboy.Tech" style="width:100%; height: 500px;">
+        </div>
+        <!-- justacat.me Tab Content -->
+        <div class="tab-pane fade" id="justacat" role="tabpanel" aria-labelledby="justacat-tab">
+            <h3>JustACat.me</h3>
+            <p>A website that I own. Believe it or not. This is getting rather meta...</p>
+            <p>
+                <a href="https://github.com/hotpiggycharlie/JustACat.me" target="_blank" class="btn btn-primary">View on GitHub</a>
+            </p>
+            <p>hosted by digital ocean, with a domain name I really like.</p>
+            <p>I love computer science <3</p>
+            <p>all provided for free by the github education program.</p>
+            <embed src="https://JustACat.me" style="width:100%; height: 500px;">
+        </div>
     </div>
 
     <!-- Achievements Section -->
-    <section>
+    <section id="achievements" class="mt-5">
         <h2>Achievements</h2>
-        <ul>
-            <li>Achievement #1: Finished my NEA: 27/3/2025.</li>
-            <li>Achievement #2: Built this website? 28/3/2025.</li>
-            <!-- Add more achievements as needed -->
+        <ul class="list-group">
+            <li class="list-group-item">Achievement #1: Finished my NEA: 27/3/2025.</li>
+            <li class="list-group-item">Achievement #2: Built this website? 28/3/2025.</li>
         </ul>
     </section>
 </main>
 
-<footer>
+<footer class="bg-light text-center py-3 mt-4 border-top">
     &copy; 2025 JustACat.me
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="Script.js"></script>
 
 </body>
