@@ -3,13 +3,11 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add transition styles
     const styleElement = document.createElement("style");
     styleElement.textContent = `
-        body, header, footer, .card, .list-group-item, .nav-link, .tab-pane, .btn {
+        body, header, footer, .card, .list-group-item, .nav-link, .btn {
             transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease !important;
         }
     `;
     document.head.appendChild(styleElement);
-
-    // Rest of dark mode implementation...
     const header = document.querySelector("header");
     const darkModeBtn = document.createElement("button");
     darkModeBtn.className = "btn btn-sm btn-outline-light position-absolute top-0 end-0 m-3";
