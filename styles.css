@@ -1,0 +1,12 @@
+code {
+    font-family: Consolas, Monaco, Courier New, monospace;
+}
+#code-block {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 1500ms ease;
+}
+
+#code-block.visible {
+    max-height: 100px; /* Adjust this value as needed */
+}
