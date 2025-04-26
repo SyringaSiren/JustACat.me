@@ -7,6 +7,3 @@ code {
     transition: max-height 1500ms ease;
 }
 
-#code-block.visible {
-    max-height: 100px; /* Adjust this value as needed */
-}

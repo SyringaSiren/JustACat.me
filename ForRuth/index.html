@@ -44,9 +44,7 @@
             overflow: hidden;
             transition: max-height 0.5s ease-in-out;
         }
-        .content-section.visible {
-            max-height: 1000px; /* Adjust this value as needed */
-        }
+
         .toggle-button {
             background-color: #4CAF50;
             color: white;
@@ -60,9 +58,7 @@
             display: none;
             margin-top: 20px;
         }
-        .interactive.visible {
-            display: block;
-        }
+
         .interactive a {
              display: inline-block;
              margin: 20px 0; /* Adjust the value as needed */
@@ -121,7 +117,7 @@
             <p>looks like this:</p>
             <img src="Half_Adder.jpg" alt="Half adder">
             <div></div>
-            <button class="toggle-button" onclick="toggleInteractive('interactive-half-adders')", style="background-color: red">Show Interactive Half Adder</button>
+            <button class="toggle-button" onclick="toggleInteractive('interactive-half-adders')" style="background-color: red">Show Interactive Half Adder</button>
             <div id="interactive-half-adders" class="interactive">
                 <label for="half-adder-a">A:</label>
                 <input type="checkbox" id="half-adder-a">
