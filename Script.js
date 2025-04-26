@@ -22,10 +22,19 @@ document.addEventListener("DOMContentLoaded", () => {
     iconLink.rel = "stylesheet";
     document.head.appendChild(iconLink);
 
-    // Check for saved preference
-    const isDarkMode = localStorage.getItem("darkMode") === "true";
-    if (isDarkMode) {
-        enableDarkMode();
+    // First check for saved user preference
+    const savedPreference = localStorage.getItem("darkMode");
+
+    // If no saved preference, use system preference
+    if (savedPreference === null) {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            enableDarkMode();
+        }
+    } else {
+        // Otherwise use saved preference
+        if (savedPreference === "true") {
+            enableDarkMode();
+        }
     }
 
     // Toggle dark/light mode
@@ -43,6 +52,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.replace("text-dark", "text-light");
         document.querySelector("header").classList.replace("bg-secondary", "bg-dark");
         document.querySelector("footer").classList.replace("bg-light", "bg-dark");
+
+        //analytics badge
+        const analyticsBadge = document.getElementById("analytics-badge");
+        if(analyticsBadge){
+            analyticsBadge.src = "https://simpleanalyticsbadges.com/justacat.me?logo=white&text=white&background=212529";
+        }//https://simpleanalyticsbadges.com/justacat.me?logo=white&text=white&background=212529
 
         // Nav tabs and content
         const navTabs = document.querySelectorAll(".nav-tabs .nav-link:not(.active)");
@@ -73,6 +88,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.replace("text-light", "text-dark");
         document.querySelector("header").classList.replace("bg-dark", "bg-secondary");
         document.querySelector("footer").classList.replace("bg-dark", "bg-light");
+
+        //analytics badge
+        const analyticsBadge = document.getElementById("analytics-badge");
+        if(analyticsBadge){
+            analyticsBadge.src = "https://simpleanalyticsbadges.com/justacat.me?logo=white&text=white&background=6C757D";
+        }
 
         // Nav tabs and content
         const navTabs = document.querySelectorAll(".nav-tabs .nav-link:not(.active)");
