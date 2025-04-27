@@ -1,3 +1,9 @@
+if(window.location.hostname === "justacat.me"){
+    document.getElementById("window-title").textContent = "Just a Cat";
+}else if(window.location.hostname === "cocks.rocks"){
+    document.getElementById("window-title").textContent = "Cocks.";
+}
+
 // Add CSS for transitions to the head
 document.addEventListener("DOMContentLoaded", () => {
     // Add transition styles
