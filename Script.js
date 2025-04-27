@@ -3,6 +3,26 @@ document.addEventListener("DOMContentLoaded", () => {
     // Add transition styles
     const styleElement = document.createElement("style");
     styleElement.textContent = `
+        /* Hide analytics badge on mobile devices */
+        @media (max-width: 768px) {
+            #analytics-badge, #analytics-badge + picture {
+                display: none !important;
+            }
+            #darkModeToggle {
+                right: auto !important;
+                left: 1rem !important;
+                font-size: 50% !important;
+            }
+        }
+        @media (max-width: 375px) {
+            #analytics-badge, #analytics-badge + picture {
+                display: none !important;
+            }
+            #darkModeToggle {
+                display: none !important;
+            }
+        }
+    
         body, header, footer, .card, .list-group-item, .nav-link, .btn {
             transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease !important;
         }
