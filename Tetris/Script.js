@@ -1,35 +1,11 @@
 const urlParams = new URLSearchParams(window.location.search);
-if (window.location.hostname === "justacat.me") {
-    document.getElementById("window-title").textContent = "Just a Cat";
-} else if (window.location.hostname === "cocks.rocks") {
-    document.getElementById("window-title").textContent = "Cocks.";
-}
+
 
 // Add CSS for transitions to the head
 document.addEventListener("DOMContentLoaded", () => {
     // Add transition styles
     const styleElement = document.createElement("style");
     styleElement.textContent = `
-        /* Hide analytics badge on mobile devices */
-        @media (max-width: 768px) {
-            #analytics-badge, #analytics-badge + picture {
-                display: none !important;
-            }
-            #darkModeToggle {
-                right: auto !important;
-                left: 1rem !important;
-                font-size: 50% !important;
-            }
-        }
-        @media (max-width: 375px) {
-            #analytics-badge, #analytics-badge + picture {
-                display: none !important;
-            }
-            #darkModeToggle {
-                display: none !important;
-            }
-        }
-    
         body, header, footer, .card, .list-group-item, .nav-link, .btn {
             transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease !important;
         }
@@ -88,25 +64,11 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelector("header").classList.replace("bg-secondary", "bg-dark");
         document.querySelector("footer").classList.replace("bg-light", "bg-dark");
 
-        //analytics badge
-        const analyticsBadge = document.getElementById("analytics-badge");
-        if (analyticsBadge) {
-            analyticsBadge.src = "https://simpleanalyticsbadges.com/justacat.me?logo=white&text=white&background=212529";
-        }//https://simpleanalyticsbadges.com/justacat.me?logo=white&text=white&background=212529
-
         // Nav tabs and content
         const navTabs = document.querySelectorAll(".nav-tabs .nav-link:not(.active)");
         navTabs.forEach(tab => {
             tab.classList.add("text-light");
             tab.style.borderColor = "#495057";
-        });
-
-        // List group items
-        const listItems = document.querySelectorAll(".list-group-item");
-        listItems.forEach(item => {
-            item.classList.add("bg-dark");
-            item.classList.add("text-light");
-            item.classList.add("border-secondary");
         });
 
         // Change button styling
