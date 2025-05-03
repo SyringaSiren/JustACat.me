@@ -123,15 +123,60 @@ document.addEventListener("DOMContentLoaded", () => {
 // Code block toggle
 const toggleCodeBtn = document.getElementById("toggle-code");
 const codeBlock = document.getElementById("code-block");
-toggleCodeBtn.addEventListener("click", () => {
-    codeBlock.classList.toggle("d-none");
-    if (!codeBlock.classList.contains("d-none")) {
-        fetch('code-snippet.cs')
-            .then(response => response.text())
-            .then(data => {
-                codeBlock.querySelector('code').textContent = data;
-            });
-    } else {
-        codeBlock.querySelector('code').textContent = '';
+if(toggleCodeBtn) {
+    toggleCodeBtn.addEventListener("click", () => {
+        codeBlock.classList.toggle("d-none");
+        if (!codeBlock.classList.contains("d-none")) {
+            fetch('code-snippet.cs')
+                .then(response => response.text())
+                .then(data => {
+                    codeBlock.querySelector('code').textContent = data;
+                });
+        } else {
+            codeBlock.querySelector('code').textContent = '';
+        }
+    });
+}
+
+//Tetris game
+addEventListener("keydown", (onkeydown = (event) => {
+    if (event.key === "ArrowLeft") {
+        sendMove("left");
+    } else if (event.key === "ArrowRight") {
+        sendMove("right");
+    } else if (event.key === "ArrowUp") {
+        sendMove("rotate right");
+    } else if (event.key === "ArrowDown") {
+        sendMove("rotate left");
+    }
+}))
+let origin = window.location.origin;
+if(window.location.origin.indexOf("https://") === -1) {
+    origin = origin.replace("http://", "ws://");
+}else{
+    origin = origin.replace("https://", "wss://");
+}
+let socket = new WebSocket(origin);
+socket.addEventListener('open', () => {
+    log("Connected to server");
+});
+
+socket.addEventListener('message', (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.type === 'move') {
+        log(`Move: ${msg.direction}`);
     }
 });
+
+function sendMove(direction) {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "move", direction }));
+    }
+}
+
+function log(message) {
+    console.log(message);
+}
+
+
+
