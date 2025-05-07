@@ -71,6 +71,10 @@ document.addEventListener("DOMContentLoaded", () => {
             tab.style.borderColor = "#495057";
         });
 
+        const gameInfo = document.getElementById("GameInfo");
+        gameInfo.classList.replace("bg-light", "bg-dark");
+        gameInfo.classList.replace("text-dark", "text-light");
+
         // Change button styling
         darkModeBtn.innerHTML = '<i class="bi bi-sun"></i> Light Mode';
         darkModeBtn.classList.replace("btn-outline-light", "btn-outline-warning");
@@ -109,6 +113,11 @@ document.addEventListener("DOMContentLoaded", () => {
             item.classList.remove("border-secondary");
         });
 
+        const gameInfo = document.getElementById("GameInfo");
+        gameInfo.classList.replace("bg-dark", "bg-light");
+        gameInfo.classList.replace("text-light", "text-dark");
+
+
         // Change button styling
         darkModeBtn.innerHTML = '<i class="bi bi-moon"></i> Dark Mode';
         darkModeBtn.classList.replace("btn-outline-warning", "btn-outline-light");
@@ -119,58 +128,61 @@ document.addEventListener("DOMContentLoaded", () => {
         localStorage.setItem("darkMode", "false");
     }
 });
-
-// Code block toggle
-const toggleCodeBtn = document.getElementById("toggle-code");
-const codeBlock = document.getElementById("code-block");
-if(toggleCodeBtn) {
-    toggleCodeBtn.addEventListener("click", () => {
-        codeBlock.classList.toggle("d-none");
-        if (!codeBlock.classList.contains("d-none")) {
-            fetch('code-snippet.cs')
-                .then(response => response.text())
-                .then(data => {
-                    codeBlock.querySelector('code').textContent = data;
-                });
-        } else {
-            codeBlock.querySelector('code').textContent = '';
-        }
-    });
-}
-
 //Tetris game
 addEventListener("keydown", (onkeydown = (event) => {
-    if (event.key === "ArrowLeft") {
-        sendMove("left");
-    } else if (event.key === "ArrowRight") {
-        sendMove("right");
-    } else if (event.key === "ArrowUp") {
-        sendMove("rotate right");
-    } else if (event.key === "ArrowDown") {
-        sendMove("rotate left");
+    if(!event.Handled) {
+        if (event.key === "ArrowLeft") {
+            console.log("left");
+            sendMove("left");
+        } else if (event.key === "ArrowRight") {
+            sendMove("right");
+        } else if (event.key === "ArrowUp") {
+            sendMove("rotate right");
+        } else if (event.key === "ArrowDown") {
+            sendMove("rotate left");
+        }
+        event.Handled = true;
     }
 }))
-let origin = window.location.origin;
-if(window.location.origin.indexOf("https://") === -1) {
-    origin = origin.replace("http://", "ws://");
-}else{
-    origin = origin.replace("https://", "wss://");
-}
+let origin = window.location.hostname;
+origin = `ws://${origin}:8080`;
 let socket = new WebSocket(origin);
 socket.addEventListener('open', () => {
     log("Connected to server");
+    RequestSync();
 });
-
+let Host = false;
 socket.addEventListener('message', (event) => {
     const msg = JSON.parse(event.data);
-    if (msg.type === 'move') {
-        log(`Move: ${msg.direction}`);
+    if (msg.type === 'SyncRequest') { //if we wear the pants, we'll get this message, so we'll tell the server everything we know
+        let WorldState = {};
+        WorldState.type = "SyncResponse";
+        WorldState.board = board;
+        WorldState.piece = piece;
+        WorldState.nextPiece = nextPiece;
+        socket.send(JSON.stringify(WorldState));
+    }
+    else if(msg.type === 'RoomControl') { //if we are a host, we should be told about it, now we know that we wear the pants
+        if(JSON.parse(Host).details === "hosting"){
+            Host = true;
+        }
+    }
+    else if(msg.type === "SyncResponse") { //if we are a guest, we should be told about it, now we know about who wears the pants
+
+        board = msg.board;
+        piece = msg.piece;
+        nextPiece = msg.nextPiece;
+        score = msg.score;
+        level = msg.level;
+        lines = msg.lines;
+        gameOver = false;
+
     }
 });
 
-function sendMove(direction) {
+function RequestSync(){
     if (socket.readyState === WebSocket.OPEN) {
-        socket.send(JSON.stringify({ type: "move", direction }));
+        socket.send(JSON.stringify({ type: "SyncRequest" }));
     }
 }
 
@@ -179,4 +191,391 @@ function log(message) {
 }
 
 
+// Tetris Game Implementation
 
+// Game constants and variables
+const COLS = 10;
+const ROWS = 20;
+const BLOCK_SIZE = 30;
+const COLORS = [
+    null,
+    '#FF0D72', // I
+    '#0DC2FF', // J
+    '#0DFF72', // L
+    '#F538FF', // O
+    '#FF8E0D', // S
+    '#FFE138', // T
+    '#3877FF'  // Z
+];
+
+// The tetromino shapes
+const SHAPES = [
+    null,
+    [[0,0,0,0], [1,1,1,1], [0,0,0,0], [0,0,0,0]], // I
+    [[2,0,0], [2,2,2], [0,0,0]],                  // J
+    [[0,0,3], [3,3,3], [0,0,0]],                  // L
+    [[4,4], [4,4]],                               // O
+    [[0,5,5], [5,5,0], [0,0,0]],                  // S
+    [[0,6,0], [6,6,6], [0,0,0]],                  // T
+    [[7,7,0], [0,7,7], [0,0,0]]                   // Z
+];
+
+let canvas, ctx;
+let nextPieceCanvas, nextPieceCtx;
+let board = [];
+let piece;
+let nextPiece;
+let score = 0;
+let level = 1;
+let lines = 0;
+let gameOver = true;
+let isPaused = false;
+let dropCounter = 0;
+let dropInterval = 1000;
+let lastTime = 0;
+let requestId = null;
+
+document.addEventListener("DOMContentLoaded", () => {
+    // Setup game after DOM is loaded
+    canvas = document.getElementById('tetris-canvas');
+    ctx = canvas.getContext('2d');
+
+    nextPieceCanvas = document.getElementById('next-piece');
+    nextPieceCtx = nextPieceCanvas.getContext('2d');
+
+    // Set up the canvas
+    ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
+    nextPieceCtx.scale(BLOCK_SIZE/2, BLOCK_SIZE/2);
+
+    // Create empty board
+    createBoard();
+
+    // Set up event listeners
+    const startButton = document.getElementById('start-button');
+    const pauseButton = document.getElementById('pause-button');
+
+    startButton.addEventListener('click', () => {
+        if (gameOver) {
+            reset();
+        }
+        if (!requestId) {
+            animate();
+        }
+    });
+
+    pauseButton.addEventListener('click', () => {
+        if (requestId) {
+            cancelAnimationFrame(requestId);
+            requestId = null;
+            isPaused = true;
+        } else {
+            isPaused = false;
+            animate();
+        }
+    });
+
+    // Initialize the WebSocket connection for Tetris
+    initializeWebSocket();
+});
+
+function createBoard() {
+    board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
+}
+
+function createPiece(type) {
+    return {
+        shape: SHAPES[type],
+        x: Math.floor(COLS / 2) - Math.floor(SHAPES[type][0].length),
+        y: 0,
+        type: type
+    };
+}
+
+function draw() {
+    // Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw board
+    drawBoard();
+
+    // Draw current piece
+    if (piece) {
+        drawPiece(ctx, piece);
+    }
+
+    // Draw next piece preview
+    drawNextPiece();
+}
+
+function drawBoard() {
+    board.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                ctx.fillStyle = COLORS[value];
+                ctx.fillRect(x, y, 1, 1);
+            }
+        });
+    });
+}
+
+function drawPiece(context, piece) {
+    piece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                context.fillStyle = COLORS[value];
+                context.fillRect(x + piece.x, y + piece.y, 1, 1);
+            }
+        });
+    });
+}
+
+function drawNextPiece() {
+    nextPieceCtx.clearRect(0, 0, nextPieceCanvas.width, nextPieceCanvas.height);
+    if (nextPiece) {
+        // Center the piece in the next piece canvas
+        const offsetX = (4 - nextPiece.shape[0].length) / 2;
+        const offsetY = (4 - nextPiece.shape.length) / 2;
+
+        nextPiece.shape.forEach((row, y) => {
+            row.forEach((value, x) => {
+                if (value !== 0) {
+                    nextPieceCtx.fillStyle = COLORS[value];
+                    nextPieceCtx.fillRect(x + offsetX, y + offsetY, 1, 1);
+                }
+            });
+        });
+    }
+}
+
+function collision() {
+    for (let y = 0; y < piece.shape.length; y++) {
+        for (let x = 0; x < piece.shape[y].length; x++) {
+            if (piece.shape[y][x] !== 0 &&
+                (board[y + piece.y] === undefined ||
+                    board[y + piece.y][x + piece.x] === undefined ||
+                    board[y + piece.y][x + piece.x] !== 0)) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function merge() {
+    piece.shape.forEach((row, y) => {
+        row.forEach((value, x) => {
+            if (value !== 0) {
+                board[y + piece.y][x + piece.x] = value;
+            }
+        });
+    });
+}
+
+function rotate(matrix, dir) {
+    // Transpose the matrix
+    const N = matrix.length;
+    const result = Array.from({length: N}, () => Array(N).fill(0));
+
+    for (let y = 0; y < N; y++) {
+        for (let x = 0; x < matrix[y].length; x++) {
+            result[x][y] = matrix[y][x];
+        }
+    }
+
+    // Reverse each row to get a rotated matrix
+    if (dir > 0) {
+        return result.map(row => row.reverse());
+    } else {
+        return result.reverse();
+    }
+}
+
+function playerRotate(dir) {
+    const originalPos = { ...piece };
+    const originalShape = piece.shape;
+
+    piece.shape = rotate(piece.shape, dir);
+
+    // Handle collision after rotation
+    if (collision()) {
+        // Try to adjust position if there's a collision
+        const offset = 1;
+        for (let attempt = 0; attempt < 2; attempt++) {
+            // Try moving right
+            piece.x += offset;
+            if (!collision()) return;
+
+            // Try moving left
+            piece.x -= offset * 2;
+            if (!collision()) return;
+
+            // Try moving up
+            piece.x = originalPos.x;
+            piece.y -= offset;
+            if (!collision()) return;
+
+            // Reset to original position and shape
+            piece.x = originalPos.x;
+            piece.y = originalPos.y;
+            piece.shape = originalShape;
+            return;
+        }
+    }
+}
+
+function playerMove(dir) {
+    piece.x += dir;
+    if (collision()) {
+        piece.x -= dir;
+    }
+}
+
+function playerDrop() {
+    piece.y++;
+    if (collision()) {
+        piece.y--;
+        merge();
+        checkLines();
+        resetPiece();
+
+        // Check for game over
+        if (collision()) {
+            gameOver = true;
+            cancelAnimationFrame(requestId);
+            requestId = null;
+        }
+    }
+    dropCounter = 0;
+}
+
+function checkLines() {
+    let linesCleared = 0;
+
+    outer: for (let y = ROWS - 1; y >= 0; y--) {
+        for (let x = 0; x < COLS; x++) {
+            if (board[y][x] === 0) continue outer;
+        }
+
+        // Remove the completed line
+        const row = board.splice(y, 1)[0].fill(0);
+        board.unshift(row);
+        y++;
+        linesCleared++;
+    }
+
+    if (linesCleared > 0) {
+        // Update score and level
+        lines += linesCleared;
+        score += linesCleared * 100 * level;
+
+        // Level up every 10 lines
+        level = Math.floor(lines / 10) + 1;
+        dropInterval = 1000 - (level - 1) * 50;
+
+        // Update UI
+        document.getElementById('score').textContent = score;
+        document.getElementById('level').textContent = level;
+        document.getElementById('lines').textContent = lines;
+    }
+}
+
+function resetPiece() {
+    piece = nextPiece || createPiece(Math.floor(Math.random() * 7) + 1);
+    nextPiece = createPiece(Math.floor(Math.random() * 7) + 1);
+}
+
+function reset() {
+    score = 0;
+    level = 1;
+    lines = 0;
+    dropInterval = 1000;
+    gameOver = false;
+
+    document.getElementById('score').textContent = score;
+    document.getElementById('level').textContent = level;
+    document.getElementById('lines').textContent = lines;
+
+    createBoard();
+    resetPiece();
+}
+
+function animate(time = 0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+
+    dropCounter += deltaTime;
+    if (dropCounter > dropInterval) {
+        playerDrop();
+    }
+
+    draw();
+    requestId = requestAnimationFrame(animate);
+}
+
+// Extend the existing WebSocket functionality for the game
+function initializeWebSocket() {
+    // Add game-specific handlers to the existing socket
+    if (socket) {
+        // Listen for game state updates from the server
+        const existingMessageHandler = socket.onmessage;
+        socket.onmessage = (event) => {
+            const msg = JSON.parse(event.data);
+
+            // Handle Tetris-specific messages
+            if (msg.type === 'gameState') {
+                // Update game state from server
+                updateGameFromServer(msg.data);
+            } else if (msg.type === 'gameOver') {
+                gameOver = true;
+                alert('Game Over! Your score: ' + score);
+            } else {
+                // Call original handler for other messages
+                if (existingMessageHandler) {
+                    existingMessageHandler(event);
+                }
+            }
+        };
+    }
+}
+
+function updateGameFromServer(gameState) {
+    // Update game based on server state
+    if (gameState.board) {
+        board = gameState.board;
+    }
+    if (gameState.score !== undefined) {
+        score = gameState.score;
+        document.getElementById('score').textContent = score;
+    }
+    if (gameState.level !== undefined) {
+        level = gameState.level;
+        document.getElementById('level').textContent = level;
+    }
+    if (gameState.lines !== undefined) {
+        lines = gameState.lines;
+        document.getElementById('lines').textContent = lines;
+    }
+}
+
+// Connect your existing keyboard event handlers to the Tetris game actions
+// Override the existing sendMove function to handle both local and server moves
+function sendMove(direction) {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "move", direction }));
+    }
+
+    // Also update the local game based on direction
+    if (!gameOver && !isPaused && piece) {
+        if (direction === "left") {
+            playerMove(-1);
+        } else if (direction === "right") {
+            playerMove(1);
+        } else if (direction === "rotate right") {
+            playerRotate(1);
+        } else if (direction === "rotate left") {
+            playerRotate(-1);
+        } else if (direction === "down") {
+            playerDrop();
+        }
+    }
+}
