@@ -155,12 +155,7 @@ let Host = false;
 socket.addEventListener('message', (event) => {
     const msg = JSON.parse(event.data);
     if (msg.type === 'SyncRequest') { //if we wear the pants, we'll get this message, so we'll tell the server everything we know
-        let WorldState = {};
-        WorldState.type = "SyncResponse";
-        WorldState.board = board;
-        WorldState.piece = piece;
-        WorldState.nextPiece = nextPiece;
-        socket.send(JSON.stringify(WorldState));
+        socket.send(JSON.stringify({type: "SyncResponse", board: board, piece: piece, nextPiece: nextPiece}));
     }
     else if(msg.type === 'RoomControl') { //if we are a host, we should be told about it, now we know that we wear the pants
         if(JSON.parse(Host).details === "hosting"){
