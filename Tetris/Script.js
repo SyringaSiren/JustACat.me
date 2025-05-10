@@ -151,18 +151,29 @@ socket.addEventListener('open', () => {
     log("Connected to server");
     RequestSync();
 });
-let Host = false;
 socket.addEventListener('message', (event) => {
     const msg = JSON.parse(event.data);
-    if (msg.type === 'SyncRequest') { //if we wear the pants, we'll get this message, so we'll tell the server everything we know
-        socket.send(JSON.stringify({type: "SyncResponse", board: board, piece: piece, nextPiece: nextPiece}));
-    }
-    else if(msg.type === 'RoomControl') { //if we are a host, we should be told about it, now we know that we wear the pants
-        if(JSON.parse(Host).details === "hosting"){
-            Host = true;
+    log(msg);
+    if (msg.type === "move") {
+        let direction = msg.direction;
+        if (direction === "left") {
+            playerMove(-1);
+        } else if (direction === "right") {
+            playerMove(1);
+        } else if (direction === "rotate right") {
+            playerRotate(1);
+        } else if (direction === "rotate left") {
+            playerRotate(-1);
+        } else if (direction === "down") {
+            playerDrop();
         }
     }
-    else if(msg.type === "SyncResponse") { //if we are a guest, we should be told about it, now we know about who wears the pants
+    else if(msg.type === "nextPiece") {
+        nextPiece = msg.detail
+    }else if(msg.type === "PieceUpdate") {
+        piece = msg.details;
+    }
+    else if(msg.type === "SyncResponse") {
 
         board = msg.board;
         piece = msg.piece;
@@ -247,9 +258,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Set up event listeners
     const startButton = document.getElementById('start-button');
-    const pauseButton = document.getElementById('pause-button');
-
+    let startFlag= false;
     startButton.addEventListener('click', () => {
+        if(!startFlag) {
+            socket.close();
+            socket = new WebSocket(origin);
+        }
+        startFlag = true;
         if (gameOver) {
             reset();
         }
@@ -257,20 +272,6 @@ document.addEventListener("DOMContentLoaded", () => {
             animate();
         }
     });
-
-    pauseButton.addEventListener('click', () => {
-        if (requestId) {
-            cancelAnimationFrame(requestId);
-            requestId = null;
-            isPaused = true;
-        } else {
-            isPaused = false;
-            animate();
-        }
-    });
-
-    // Initialize the WebSocket connection for Tetris
-    initializeWebSocket();
 });
 
 function createBoard() {
@@ -475,8 +476,7 @@ function checkLines() {
 }
 
 function resetPiece() {
-    piece = nextPiece || createPiece(Math.floor(Math.random() * 7) + 1);
-    nextPiece = createPiece(Math.floor(Math.random() * 7) + 1);
+    piece = nextPiece;
 }
 
 function reset() {
@@ -507,70 +507,10 @@ function animate(time = 0) {
     requestId = requestAnimationFrame(animate);
 }
 
-// Extend the existing WebSocket functionality for the game
-function initializeWebSocket() {
-    // Add game-specific handlers to the existing socket
-    if (socket) {
-        // Listen for game state updates from the server
-        const existingMessageHandler = socket.onmessage;
-        socket.onmessage = (event) => {
-            const msg = JSON.parse(event.data);
 
-            // Handle Tetris-specific messages
-            if (msg.type === 'gameState') {
-                // Update game state from server
-                updateGameFromServer(msg.data);
-            } else if (msg.type === 'gameOver') {
-                gameOver = true;
-                alert('Game Over! Your score: ' + score);
-            } else {
-                // Call original handler for other messages
-                if (existingMessageHandler) {
-                    existingMessageHandler(event);
-                }
-            }
-        };
-    }
-}
-
-function updateGameFromServer(gameState) {
-    // Update game based on server state
-    if (gameState.board) {
-        board = gameState.board;
-    }
-    if (gameState.score !== undefined) {
-        score = gameState.score;
-        document.getElementById('score').textContent = score;
-    }
-    if (gameState.level !== undefined) {
-        level = gameState.level;
-        document.getElementById('level').textContent = level;
-    }
-    if (gameState.lines !== undefined) {
-        lines = gameState.lines;
-        document.getElementById('lines').textContent = lines;
-    }
-}
-
-// Connect your existing keyboard event handlers to the Tetris game actions
-// Override the existing sendMove function to handle both local and server moves
+// Connect your keyboard event handlers to the Tetris game actions
 function sendMove(direction) {
     if (socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ type: "move", direction }));
-    }
-
-    // Also update the local game based on direction
-    if (!gameOver && !isPaused && piece) {
-        if (direction === "left") {
-            playerMove(-1);
-        } else if (direction === "right") {
-            playerMove(1);
-        } else if (direction === "rotate right") {
-            playerRotate(1);
-        } else if (direction === "rotate left") {
-            playerRotate(-1);
-        } else if (direction === "down") {
-            playerDrop();
-        }
     }
 }
