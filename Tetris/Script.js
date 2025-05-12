@@ -148,10 +148,12 @@ const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
 origin = `${protocol}${origin}:8080`;
 let socket = new WebSocket(origin);
 socket.addEventListener('open', () => {
+    startButton.attributes.removeNamedItem("disabled");
+    console.log('WebSocket connection established');
     RequestSync();
 });
-
-document.getElementById("start-button").addEventListener("click", () => {
+const startButton = document.getElementById("start-button");
+startButton.addEventListener("click", () => {
     socket.send(JSON.stringify({type: "StartGame"}));
     RequestSync();
 })
