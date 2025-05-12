@@ -144,7 +144,8 @@ addEventListener("keydown", (onkeydown = (event) => {
     }
 }))
 let origin = window.location.hostname;
-origin = `ws://${origin}:8080`;
+const protocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+origin = `${protocol}${origin}:8080`;
 let socket = new WebSocket(origin);
 socket.addEventListener('open', () => {
     RequestSync();
@@ -152,6 +153,7 @@ socket.addEventListener('open', () => {
 
 document.getElementById("start-button").addEventListener("click", () => {
     socket.send(JSON.stringify({type: "StartGame"}));
+    RequestSync();
 })
 
 socket.addEventListener('message', (event) => {
@@ -255,20 +257,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Set up the canvas
     ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
     nextPieceCtx.scale(BLOCK_SIZE/2, BLOCK_SIZE/2);
-
-    // Set up event listeners
-    const startButton = document.getElementById('start-button');
-    let startFlag= false;
-    startButton.addEventListener('click', () => {
-        if(!startFlag) {
-            socket.close();
-            socket = new WebSocket(origin);
-        }
-        startFlag = true;
-        if (gameOver) {
-            reset();
-        }
-    });
 });
 
 
