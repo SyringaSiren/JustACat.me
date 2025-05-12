@@ -132,7 +132,6 @@ document.addEventListener("DOMContentLoaded", () => {
 addEventListener("keydown", (onkeydown = (event) => {
     if(!event.Handled) {
         if (event.key === "ArrowLeft") {
-            console.log("left");
             sendMove("left");
         } else if (event.key === "ArrowRight") {
             sendMove("right");
@@ -148,12 +147,15 @@ let origin = window.location.hostname;
 origin = `ws://${origin}:8080`;
 let socket = new WebSocket(origin);
 socket.addEventListener('open', () => {
-    log("Connected to server");
     RequestSync();
 });
+
+document.getElementById("start-button").addEventListener("click", () => {
+    socket.send(JSON.stringify({type: "StartGame"}));
+})
+
 socket.addEventListener('message', (event) => {
     const msg = JSON.parse(event.data);
-    log(msg);
     if (msg.type === "move") {
         let direction = msg.direction;
         if (direction === "left") {
@@ -164,9 +166,17 @@ socket.addEventListener('message', (event) => {
             playerRotate(1);
         } else if (direction === "rotate left") {
             playerRotate(-1);
-        } else if (direction === "down") {
-            playerDrop();
         }
+
+        draw();
+    }
+    else if (msg.type === "PieceDropped") {
+        playerDrop();
+
+        draw();
+    }
+    else if (msg.type === "PieceMerged") { //resync with the whole board
+        board = msg.board;
     }
     else if(msg.type === "nextPiece") {
         nextPiece = msg.detail
@@ -190,10 +200,6 @@ function RequestSync(){
     if (socket.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ type: "SyncRequest" }));
     }
-}
-
-function log(message) {
-    console.log(message);
 }
 
 
@@ -235,9 +241,6 @@ let score = 0;
 let level = 1;
 let lines = 0;
 let gameOver = true;
-let isPaused = false;
-let dropCounter = 0;
-let dropInterval = 1000;
 let lastTime = 0;
 let requestId = null;
 
@@ -253,9 +256,6 @@ document.addEventListener("DOMContentLoaded", () => {
     ctx.scale(BLOCK_SIZE, BLOCK_SIZE);
     nextPieceCtx.scale(BLOCK_SIZE/2, BLOCK_SIZE/2);
 
-    // Create empty board
-    createBoard();
-
     // Set up event listeners
     const startButton = document.getElementById('start-button');
     let startFlag= false;
@@ -268,24 +268,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (gameOver) {
             reset();
         }
-        if (!requestId) {
-            animate();
-        }
     });
 });
 
-function createBoard() {
-    board = Array.from({length: ROWS}, () => Array(COLS).fill(0));
-}
-
-function createPiece(type) {
-    return {
-        shape: SHAPES[type],
-        x: Math.floor(COLS / 2) - Math.floor(SHAPES[type][0].length),
-        y: 0,
-        type: type
-    };
-}
 
 function draw() {
     // Clear the canvas
@@ -357,16 +342,6 @@ function collision() {
     return false;
 }
 
-function merge() {
-    piece.shape.forEach((row, y) => {
-        row.forEach((value, x) => {
-            if (value !== 0) {
-                board[y + piece.y][x + piece.x] = value;
-            }
-        });
-    });
-}
-
 function rotate(matrix, dir) {
     // Transpose the matrix
     const N = matrix.length;
@@ -428,20 +403,6 @@ function playerMove(dir) {
 
 function playerDrop() {
     piece.y++;
-    if (collision()) {
-        piece.y--;
-        merge();
-        checkLines();
-        resetPiece();
-
-        // Check for game over
-        if (collision()) {
-            gameOver = true;
-            cancelAnimationFrame(requestId);
-            requestId = null;
-        }
-    }
-    dropCounter = 0;
 }
 
 function checkLines() {
@@ -490,22 +451,9 @@ function reset() {
     document.getElementById('level').textContent = level;
     document.getElementById('lines').textContent = lines;
 
-    createBoard();
     resetPiece();
 }
 
-function animate(time = 0) {
-    const deltaTime = time - lastTime;
-    lastTime = time;
-
-    dropCounter += deltaTime;
-    if (dropCounter > dropInterval) {
-        playerDrop();
-    }
-
-    draw();
-    requestId = requestAnimationFrame(animate);
-}
 
 
 // Connect your keyboard event handlers to the Tetris game actions
