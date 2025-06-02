@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     } else {
-        if (urlParams.get("darkMode") === true) {
+        if (urlParams.get("darkMode") === "true") {
             enableDarkMode();
         } else {
             disableDarkMode();
