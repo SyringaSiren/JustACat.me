@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         }
     } else {
-        if (urlParams.get("DarkMode") === "true") {
+        if (urlParams.get("darkMode") === true) {
             enableDarkMode();
         } else {
             disableDarkMode();
@@ -197,6 +197,14 @@ socket.addEventListener('message', (event) => {
         lines = msg.lines;
         gameOver = false;
 
+    }else if(msg.type === "ScoreUpdate") {
+        score = msg.score;
+        level = msg.level;
+        lines = msg.lines;
+
+        document.getElementById('score').textContent = score;
+        document.getElementById('level').textContent = level;
+        document.getElementById('lines').textContent = lines;
     }
 });
 
